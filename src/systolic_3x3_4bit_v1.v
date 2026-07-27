@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 // [4B] adjust this include path to your tree, e.g. "../../pe/pe_44_sIuI_pipelined_v1/pe_44_sIuI_pipelined.v"
-`include "pe_44_sIuI_pipelined.v"
+// `include "pe_44_sIuI_pipelined.v"
 
 // systolic_3x3_4bit_v1.v
 // [4B] Port of systolic_3x3_v3 from the old v3 8-bit PE to the certified 4-bit
