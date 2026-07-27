@@ -41,7 +41,27 @@ jobs:
     needs: gds
     runs-on: ubuntu-24.04
     permissions:
+      actions: write    # to remove stale Pages artifacts on job reruns
       pages: write      # to deploy to Pages
       id-token: write   # to verify the deployment originates from an appropriate source
     steps:
+      - name: Remove stale github-pages artifact on reruns
+        if: ${{ github.run_attempt > 1 }}
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const run_id = context.runId;
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              owner,
+              repo,
+              run_id,
+              per_page: 100,
+            });
+            const staleArtifacts = artifacts.filter((artifact) => artifact.name === "github-pages");
+            core.info(`Found ${staleArtifacts.length} stale github-pages artifact(s) in run ${run_id}`);
+            for (const artifact of staleArtifacts) {
+              await github.rest.actions.deleteArtifact({ owner, repo, artifact_id: artifact.id });
+              core.info(`Deleted stale artifact ${artifact.id}`);
+            }
       - uses: TinyTapeout/tt-gds-action/viewer@ttsky26c
